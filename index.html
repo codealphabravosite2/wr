@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Script Writer</title>
+  <link rel="stylesheet" href="./style.css">
+  <link rel="icon" href="./icon-192x192.png" type="image/png">
+  <link rel="shortcut icon" href="./icon-192x192.png" type="image/png">
+  <link rel="apple-touch-icon" href="./icon-192x192.png">
+
+  <link rel="manifest" href="./manifest.webmanifest">
+</head>
+<body>
+  <div id="app">
+    <div id="notes-list-view">
+      <header>
+        <div class="header-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20h9" /> <!-- Line at the bottom representing the surface -->
+            <path d="M16.5 3.5l4 4L7 21H3v-4L16.5 3.5z" /> <!-- Pencil shape -->
+          </svg>
+          <h1>Script Writer</h1>
+        </div>
+        <div class="toolbar-buttons">
+
+          <!-- MODIFIED: The global header now ONLY has Import and New -->
+          <button id="import-note" class="toolbar-btn" aria-label="Import a note" title="Import Note">
+             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+          </button>
+          
+          <button id="new-note" class="toolbar-btn" aria-label="Create new note" title="New Note">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M12 5v14m-7-7h14" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+      </header>
+      
+      <div class="search-container">
+        <input type="search" id="search" placeholder="Search notes..." />
+      </div>
+
+      <div id="notes-list"></div>
+    </div>
+
+    <div id="editor" class="hidden">
+      <div class="editor-toolbar">
+        <div class="toolbar-left">
+          <button id="back-button" class="toolbar-btn" title="Back to notes">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M19 12H5m7 7l-7-7 7-7" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+
+          <!-- ADDED: Export button moved here, next to delete -->
+          <button id="export-current-note" class="toolbar-btn" aria-label="Export this note" title="Export this Note">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+          </button>
+
+          <button id="delete-button" class="toolbar-btn" title="Delete note">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        <div class="toolbar-right">
+          <button id="undo-button" class="toolbar-btn" title="Undo" disabled>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M3 7v6h6M3 13c0-4.97 4.03-9 9-9 4.97 0 9 4.03 9 9s-4.03 9-9 9c-2.49 0-4.74-1.01-6.36-2.64" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <button id="redo-button" class="toolbar-btn" title="Redo" disabled>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M21 7v6h-6m6 0c0-4.97-4.03-9-9-9-4.97 0-9 4.03-9 9s4.03 9 9 9c2.49 0 4.74-1.01 6.36-2.64" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <button id="add-toggle" class="toolbar-btn" title="Add Section">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M12 5v14m-7-7h14" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="editor-content">
+        <input type="text" id="note-title" placeholder="Title" />
+        <div id="toggles-container"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADDED: Hidden file input for the import functionality -->
+  <input type="file" id="import-file-input" accept=".json,application/json" style="display: none;" />
+
+  <script type="module" src="./main.js"></script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(registration => {
+          console.log('Service Worker registered successfully:', registration.scope);
+        })
+        .catch(error => {
+          console.log('Service Worker registration failed:', error);
+        });
+    });
+  }
+  </script>
+</body>
+</html>
